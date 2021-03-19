@@ -1,0 +1,222 @@
+public int[][] olDadd(int[][] compressed1, int[][] compressed2) {
+        //throw new UnsupportedOperationException("Apartado 13");
+
+        int len1 = compressed1.length - 1; // length of compressed1 array
+        int len2 = compressed2.length - 1; // length of compressed2 array
+        int [][] copy1 = createCompressed(len1+1); // temporal array
+        int [][] copy2 = createCompressed(len2+1); // temporal array
+        int sum = 2 + len1 + len2; // sum of lengths of the input arrays
+        int[][] compressedResultIsh = new int[sum][2]; // output array
+        int lenCompressedResult = 0; // length of lenCompressedResult array
+        int index = 0; // index to allocate values to compressedResult
+        int[][] compressedResult; // output array
+
+        if (len1 > -1 && len2 > -1) { //if some input array is empty
+            //copy values to temp array
+            for (int i = 0; i < len1+1; i++) {
+                copy1[i][DEGREE] = compressed1[i][DEGREE];
+                copy1[i][COEFFICIENT] = compressed1[i][COEFFICIENT];
+            }
+            for (int i = 0; i < len2+1; i++) {
+                copy2[i][DEGREE] = compressed2[i][DEGREE];
+                copy2[i][COEFFICIENT] = compressed2[i][COEFFICIENT];
+            }
+
+            //passing values to compressedResultIsh
+            for (int i = 0; i < sum; i++) {
+                if (!(copy1[FIRST_ELEMENT][DEGREE] == 0 && copy1[FIRST_ELEMENT][COEFFICIENT] == 0 && copy2[FIRST_ELEMENT][DEGREE] == 0 && copy2[FIRST_ELEMENT][COEFFICIENT] == 0)) { // both reached the end
+                    if (copy1[FIRST_ELEMENT][DEGREE] > copy2[FIRST_ELEMENT][DEGREE]) {
+                        if (!(copy2[FIRST_ELEMENT][DEGREE] == 0 && copy2[FIRST_ELEMENT][COEFFICIENT] == 0)) { // reached the end
+                            compressedResultIsh[i][DEGREE] = copy2[FIRST_ELEMENT][DEGREE];
+                            compressedResultIsh[i][COEFFICIENT] = copy2[FIRST_ELEMENT][COEFFICIENT];
+                            copy2[FIRST_ELEMENT][DEGREE] = 0;
+                            copy2[FIRST_ELEMENT][COEFFICIENT] = 0;
+                        }
+                        else {
+                            compressedResultIsh[i][DEGREE] = copy1[FIRST_ELEMENT][DEGREE];
+                            compressedResultIsh[i][COEFFICIENT] = copy1[FIRST_ELEMENT][COEFFICIENT];
+                            copy1[FIRST_ELEMENT][DEGREE] = 0;
+                            copy1[FIRST_ELEMENT][COEFFICIENT] = 0;
+                        }
+                    }
+                    else if (copy2[FIRST_ELEMENT][DEGREE] > copy1[FIRST_ELEMENT][DEGREE]) {
+                        if (!(copy1[FIRST_ELEMENT][DEGREE] == 0 && copy1[FIRST_ELEMENT][COEFFICIENT] == 0)) { // reached the end
+                            compressedResultIsh[i][DEGREE] = copy1[FIRST_ELEMENT][DEGREE];
+                            compressedResultIsh[i][COEFFICIENT] = copy1[FIRST_ELEMENT][COEFFICIENT];
+                            copy1[FIRST_ELEMENT][DEGREE] = 0;
+                            copy1[FIRST_ELEMENT][COEFFICIENT] = 0;
+                        }
+                        else {
+                            compressedResultIsh[i][DEGREE] = copy2[FIRST_ELEMENT][DEGREE];
+                            compressedResultIsh[i][COEFFICIENT] = copy2[FIRST_ELEMENT][COEFFICIENT];
+                            copy2[FIRST_ELEMENT][DEGREE] = 0;
+                            copy2[FIRST_ELEMENT][COEFFICIENT] = 0;
+                        }
+                    }
+                    else if (copy1[FIRST_ELEMENT][DEGREE] == compressedResultIsh[i][DEGREE] || copy2[FIRST_ELEMENT][DEGREE] == compressedResultIsh[i][DEGREE] || copy1[FIRST_ELEMENT][DEGREE] == copy2[FIRST_ELEMENT][DEGREE]) {
+                        if (copy1[FIRST_ELEMENT][COEFFICIENT] + copy2[FIRST_ELEMENT][COEFFICIENT] != 0) {
+                            compressedResultIsh[i][DEGREE] = copy1[FIRST_ELEMENT][DEGREE];
+                            compressedResultIsh[i][COEFFICIENT] = copy1[FIRST_ELEMENT][COEFFICIENT] + copy2[FIRST_ELEMENT][COEFFICIENT];
+                        }
+                        copy1[FIRST_ELEMENT][DEGREE] = 0;
+                        copy1[FIRST_ELEMENT][COEFFICIENT] = 0;
+                        copy2[FIRST_ELEMENT][DEGREE] = 0;
+                        copy2[FIRST_ELEMENT][COEFFICIENT] = 0;
+                    }
+                    if (copy1[FIRST_ELEMENT][DEGREE] == 0 && copy1[FIRST_ELEMENT][COEFFICIENT] == 0) { // replace array n by array n+1
+                        for (int j = 0; j < len1; j++) {
+                            copy1[j][DEGREE] = copy1[j+1][DEGREE];
+                            copy1[j][COEFFICIENT] = copy1[j+1][COEFFICIENT];
+                        }
+                        copy1[len1][DEGREE] = 0;
+                        copy1[len1][COEFFICIENT] = 0;
+                    }
+                    if (copy2[FIRST_ELEMENT][DEGREE] == 0 && copy2[FIRST_ELEMENT][COEFFICIENT] == 0) { // replace array n by array n+1
+                        for (int j = 0; j < len2; j++) {
+                            copy2[j][DEGREE] = copy2[j+1][DEGREE];
+                            copy2[j][COEFFICIENT] = copy2[j+1][COEFFICIENT];
+                        }
+                        copy2[len2][DEGREE] = 0;
+                        copy2[len2][COEFFICIENT] = 0;
+                    }
+                }
+            }
+
+            for (int i = 0; i < sum; i++) {
+                if (!(compressedResultIsh[i][DEGREE] == 0 && compressedResultIsh[i][COEFFICIENT] == 0)) {
+                    lenCompressedResult++;
+                }
+            }
+
+            //passing values to compressedResult
+            compressedResult = createCompressed(lenCompressedResult); // output array
+
+            if (compressedResult.length > 0) {
+                for (int[] element : compressedResultIsh) {
+                    if (!(element[DEGREE] == 0 && element[COEFFICIENT] == 0)) {
+                        compressedResult[index][DEGREE] = element[DEGREE];
+                        compressedResult[index][COEFFICIENT] = element[COEFFICIENT];
+                        index++;
+                    }
+                }
+            }
+            return compressedResult;
+        }
+
+        else if(len1 > 0 && len2 == -1) {
+            return compressed1;
+        }
+
+        else if(len1 == -1 && len2 > 0) {
+            return compressed2;
+        }
+
+        else {
+            return createCompressed(0);
+        }
+    }
+
+    public int[][] odDadd(int[][] compressed1, int[][] compressed2) {
+        //throw new UnsupportedOperationException("Apartado 13");
+
+        int len1 = compressed1.length - 1; // length of compressed1 array
+        int len2 = compressed2.length - 1; // length of compressed2 array
+        int index1 = 0; // index of compressed1 array
+        int index2 = 0; // index of compressed1 array
+        int indexRIsh = 0; // index of compressedResultIsh
+        boolean ended1 = false; // if last value has been added
+        boolean ended2 = false; // if last value has been added
+        int sum = 2 + len1 + len2; // sum of lengths of the input arrays
+        int[][] compressedResultIsh = new int[sum][2]; // output array
+        int indexR = 0; // index to allocate values to compressedResult
+        int[][] compressedResult; // output array
+
+        if (len1 > -1 && len2 > -1) { //if some input array is empty
+            //passing values to compressedResultIsh
+            while (!ended1 && !ended2) {
+                if (!ended1 && !ended2) {
+                    if (compressed1[index1][0] < compressed2[index2][0]) {
+                        compressedResultIsh[indexRIsh][0] = compressed1[index1][0];
+                        compressedResultIsh[indexRIsh][1] = compressed1[index1][1];
+                        indexRIsh++;
+                        if (!ended1 && index1 == len1) {
+                            ended1 = true;
+                        }
+                        if (index1 < len1) {
+                            index1++;
+                        }
+                    }
+                    else if (compressed2[index2][0] < compressed1[index1][0]) {
+                        compressedResultIsh[indexRIsh][0] = compressed2[index2][0];
+                        compressedResultIsh[indexRIsh][1] = compressed2[index2][1];
+                        indexRIsh++;
+                        if (!ended2 && index2 == len2) {
+                            ended2 = true;
+                        }
+                        if (index2 < len2) {
+                            index2++;
+                        }
+                    }
+                    else if (compressed1[index1][0] == compressed2[index2][0]) {
+                        if (compressed1[index1][1] + compressed2[index2][1] != 0) {
+                            compressedResultIsh[indexRIsh][0] = compressed1[index1][0];
+                            compressedResultIsh[indexRIsh][1] = compressed1[index1][1] + compressed2[index2][1];
+                            indexRIsh++;
+                        }
+                        if (!ended1 && index1 == len1) {
+                            ended1 = true;
+                        }
+                        if (index1 < len1) {
+                            index1++;
+                        }
+                        if (!ended2 && index2 == len2) {
+                            ended2 = true;
+                        }
+                        if (index2 < len2) {
+                            index2++;
+                        }
+                    }
+                }
+            }
+            if (ended2 && !ended1) {
+                for (int i = index1; i < len1+1; i++) {
+                    compressedResultIsh[indexRIsh][0] = compressed1[i][0];
+                    compressedResultIsh[indexRIsh][1] = compressed1[i][1];
+                    indexRIsh++;
+                }
+            }
+            else if (ended1 && !ended2) {
+                for (int i = index2; i < len2+1; i++) {
+                    compressedResultIsh[indexRIsh][0] = compressed2[i][0];
+                    compressedResultIsh[indexRIsh][1] = compressed2[i][1];
+                    indexRIsh++;
+                }
+            }
+
+            //passing values to compressedResult
+            compressedResult = createCompressed(indexRIsh); // output array
+
+            if (compressedResult.length > 0) {
+                for (int[] element : compressedResultIsh) {
+                    if (!(element[DEGREE] == 0 && element[COEFFICIENT] == 0)) {
+                        compressedResult[indexR][DEGREE] = element[DEGREE];
+                        compressedResult[indexR][COEFFICIENT] = element[COEFFICIENT];
+                        indexR++;
+                    }
+                }
+            }
+            return compressedResult;
+        }
+
+        else if(len1 > 0 && len2 == -1) {
+            return compressed1;
+        }
+
+        else if(len1 == -1 && len2 > 0) {
+            return compressed2;
+        }
+
+        else {
+            return createCompressed(0);
+        }
+    }
